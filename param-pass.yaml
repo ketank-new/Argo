@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: build-pkg-
+  labels:
+    workflows.argoproj.io/archive-strategy: "false"
+spec:
+  entrypoint: build-pkg
+  arguments:
+    parameters:
+    - name: message
+      value: "Msg from ketan"
+  templates:
+  - name: build-pkg
+    inputs:
+      parameters:
+      - name: message
+    script:
+      image: sys-powerai-condaimages-docker-local.artifactory.swg-devops.com/pai-conda3:next-dev-rhel-ppc64le
+      command: [bash]
+      source: |
+        cat /etc/os-release
+        #git clone git@github.ibm.com:open-ce/universe.git
+        echo {{workflow.name}}
+        echo {{workflow.namespace}}
+        echo {{workflow.serviceAccountName}}
+        echo {{workflow.uid}}
