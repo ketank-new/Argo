@@ -6,4 +6,3 @@ chmod +x argo-linux-amd64
 mv ./argo-linux-amd64 /usr/local/bin/argo
 argo version
 
-kubectl apply -f secret-git.yaml -f secret-art.yaml -f serviceaccount.yaml -n argo
