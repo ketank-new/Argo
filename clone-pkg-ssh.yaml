@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: build-pkg-
+  labels:
+    workflows.argoproj.io/archive-strategy: "false"
+spec:
+  entrypoint: build-pkg
+  templates:
+  - name: build-pkg
+    script:
+      image: ubuntu:18.04
+      env:
+       - name: SECURE_VALUE
+         valueFrom:
+           secretKeyRef:
+             name: git-access
+             key: ssh-privatekey
+      command: [bash]
+      securityContext:
+        runAsUser: 1084
+      source: |
+        cat /etc/os-release
+        echo $SECURE_VALUE
+        echo BUILDING FRAMEWORK $(inputs.params.framework)
+        echo -----------------------------------
+        mkdir -p $HOME/.ssh/
+        echo -e "$SECURE_VALUE" > $HOME/.ssh/id_rsa
+        echo -e "Host github.ibm.com\n\tStrictHostKeyChecking no\n" >> $HOME/.ssh/config
+        chmod -R 700 $HOME/.ssh/
+        rm $HOME/.ssh/id_rsa.pub
+        cd $HOME
+        git clone git@github.ibm.com:open-ce/numactl-feedstock.git
+        echo {{workflow.name}}
+        echo {{workflow.namespace}}
+        echo {{workflow.serviceAccountName}}
+        echo {{workflow.uid}}
