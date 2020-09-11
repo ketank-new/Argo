@@ -6,6 +6,10 @@ metadata:
     workflows.argoproj.io/archive-strategy: "false"
 spec:
   entrypoint: build-pkg
+  volumes:
+  - name: git-secret-vol
+  secret:
+    secretName: git-token
   arguments:
     parameters:
     - name: message
@@ -15,12 +19,25 @@ spec:
     inputs:
       parameters:
       - name: message
+    env:
+    - name: USER
+    valueFrom:
+      secretKeyRef:
+        name: git-token
+        key: username
+    - name: TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: git-token
+        key: password
     script:
-      image: sys-powerai-condaimages-docker-local.artifactory.swg-devops.com/pai-conda3:next-dev-rhel-ppc64le
+      image: ubuntu:18.04
       command: [bash]
       source: |
         cat /etc/os-release
-        #git clone git@github.ibm.com:open-ce/universe.git
+        echo $USER
+        echo $TOKEN
+        #git clone https://github.ibm.com/open-ce/numactl-feedstock.git
         echo {{workflow.name}}
         echo {{workflow.namespace}}
         echo {{workflow.serviceAccountName}}
