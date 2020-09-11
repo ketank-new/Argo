@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: base-image-
+  labels:
+    workflows.argoproj.io/archive-strategy: "false"
+spec:
+  entrypoint: base-image
+  templates:
+  - name: base-image
+    container:
+      image: sys-powerai-condaimages-docker-local.artifactory.swg-devops.com/pai-conda3:next-dev-rhel-ppc64le
+      command: [cat]
+      args: ["/etc/os-release"]
